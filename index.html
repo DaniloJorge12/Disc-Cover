@@ -1,626 +1,1239 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Music Cover — Jogo de Votação</title>
-<style>
-:root{--bg:#0f1724;--card:#0b1220;--glass:rgba(255,255,255,0.06)}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
-#app{width:100%;max-width:1100px;margin:24px}
-.bg{position:fixed;inset:0;background-image:url('background.png');background-size:cover;background-position:center;filter:brightness(.45);z-index:-1}
-header.start-screen{background:rgba(0,0,0,.6);padding:28px;border-radius:12px}
-h1{margin:0 0 6px;font-size:28px}
-p.lead{margin:0 0 18px;opacity:.9}
-.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.control{background:var(--glass);padding:12px;border-radius:8px}
-label{display:block;font-size:13px;margin-bottom:6px}
-input[type=number],input[type=text]{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#fff;text-align:center}
-input[type=number]{width:72px}
-.player-name{width:120px}
-button.primary{padding:10px 18px;border-radius:10px;border:none;background:#10b981;color:#012;text-transform:uppercase;font-weight:700;cursor:pointer}
-.game-area{display:none;margin-top:18px}
-.covers{display:flex;gap:12px;justify-content:center}
-.cover{width:170px;height:170px;flex:0 0 170px;border-radius:8px;overflow:hidden;background:#222;border:4px solid rgba(255,255,255,0.04);transition:transform .25s ease,opacity .25s ease}
-.cover img{width:100%;height:100%;object-fit:cover;display:block}
-.status{margin-top:16px;text-align:center}
-.status .line{font-weight:700}
-.vote-panel{display:none;margin-top:18px;padding:18px;background:var(--glass);border-radius:10px;text-align:center}
-.vote-panel input[type=password]{font-size:20px;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;width:140px;text-align:center}
-.results{display:none;margin-top:18px;text-align:center;background:transparent !important;box-shadow:none !important;padding:0;animation:fadeIn .8s ease}
-.winner{font-size:1.8em;font-weight:900;color:#ffb400;margin-bottom:10px;text-shadow:0 0 12px rgba(0,0,0,0.7)}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-/* tela final styles */
-#telaFinal{animation:fadeIn .8s ease}
-#telaFinal h1{font-size:2.2rem;margin:0 0 16px;color:#ffb400;text-shadow:0 0 12px rgba(0,0,0,0.6)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Music Cover — Jogo de Votação</title>
+
+  <!-- Fonte -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Montserrat:wght@600;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #ffb200, #ff5200, #a80000);
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Efeito de gradiente dinâmico suave */
+    @keyframes gradientShift {
+      0% {
+        background: radial-gradient(circle at center, #ffb200, #ff5200, #a80000);
+      }
+
+      50% {
+        background: radial-gradient(circle at 40% 60%, #ffd000, #ff7300, #c00000);
+      }
+
+      100% {
+        background: radial-gradient(circle at center, #ffb200, #ff5200, #a80000);
+      }
+    }
+
+    body {
+      animation: gradientShift 10s ease-in-out infinite alternate;
+    }
+
+    :root {
+      --bg-900: #071027;
+      --bg-800: #0b1320;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-2: rgba(255, 255, 255, 0.035);
+      --accent: #ffb33a;
+      --accent-2: #10b981;
+      --muted: rgba(255, 255, 255, 0.75);
+      --card: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      --shadow: 0 8px 30px rgba(2, 6, 23, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.06);
+      --glass-glow: 0 6px 30px rgba(16, 185, 129, 0.06);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(255, 179, 58, 0.06), transparent),
+        radial-gradient(900px 400px at 90% 90%, rgba(16, 185, 129, 0.04), transparent),
+        var(--bg-900);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+    }
+
+    /* App wrapper */
+    #app {
+      width: 100%;
+      max-width: 1150px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Background image layer */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background-image: url('background.png');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(.35) blur(2px);
+      z-index: -1;
+    }
+
+    /* Left column (main screens) */
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(6px) saturate(1.05);
+    }
+
+    header.start-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0ea5a3, #7c3aed);
+      font-weight: 900;
+      font-family: Montserrat, Inter, sans-serif;
+      color: white;
+      font-size: 20px;
+      box-shadow: var(--glass-glow);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Montserrat, Inter, sans-serif;
+      font-size: 20px;
+    }
+
+    p.lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .control {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      min-width: 160px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px
+    }
+
+    input[type=number],
+    input[type=text] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .player-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .player-chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    /* Primary button */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      box-shadow: 0 6px 20px rgba(2, 6, 23, 0.5);
+    }
+
+    .btn--primary {
+      background: linear-gradient(90deg, var(--accent), #ff8c2a);
+      color: #071027;
+    }
+
+    .btn--muted {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+    }
+
+    /* Game area */
+    .game-area {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .covers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    .cover {
+      aspect-ratio: 1/1;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: #111;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: transform .28s cubic-bezier(.2, .9, .3, 1), box-shadow .28s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .5s
+    }
+
+    .cover:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(2, 6, 23, 0.6);
+    }
+
+    .cover .badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    /* status and progress */
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .status .left {
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .status .line {
+      font-weight: 800;
+      font-size: 15px
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+      width: 320px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .progress>i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #ff8c2a);
+      width: 0%;
+      transition: width .6s ease;
+    }
+
+    /* vote panel */
+    /* Campo invisível de voto (sem mostrar caractere algum) */
+    .vote-panel input[type="text"].hidden-input {
+      color: transparent !important;
+      text-shadow: 0 0 0 transparent !important;
+      caret-color: transparent;
+    }
+
+    .vote-panel .instruction {
+      font-weight: 700
+    }
+
+    .vote-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input.vote-digit {
+      width: 88px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 20px;
+      text-align: center;
+      background: transparent;
+      color: #fff;
+      letter-spacing: 6px;
+    }
+
+    /* results */
+    .results {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .winner {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 6px 24px rgba(255, 179, 58, 0.08)
+    }
+
+    /* Right column: scoreboard */
+    .sidebar {
+      position: sticky;
+      top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .score-card {
+      padding: 16px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    .score-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .score-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px
+    }
+
+    .score-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.12);
+      font-weight: 600
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    /* modal final */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    .modal-inner {
+      background: linear-gradient(180deg, #081022, #061018);
+      padding: 28px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      width: min(720px, 96%);
+      box-shadow: var(--shadow)
+    }
+
+    /* responsive */
+    @media (max-width:980px) {
+      #app {
+        grid-template-columns: 1fr;
+        padding-bottom: 60px
+      }
+
+      .sidebar {
+        position: relative;
+        top: unset
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="bg"></div>
-<div id="app">
-  <header class="start-screen" id="startScreen">
-    <h1>Music Cover</h1>
-    <p class="lead">Adivinhe a capa da música</p>
-    <div class="controls">
-      <div class="control">
-        <label for="numPlayers">Número de jogadores</label>
-        <input id="numPlayers" type="number" min="2" max="6" value="4">
+
+  <canvas id="particles"></canvas>
+
+  <div class="bg" aria-hidden="true"></div>
+
+  <div id="app" role="application" aria-label="Music Cover - Jogo de Votação">
+    <!-- MAIN (left) -->
+    <div class="panel" id="leftPanel">
+      <!-- TELA INICIAL / START -->
+      <header class="start-screen" id="startScreen" aria-live="polite">
+        <div class="brand">
+          <div class="logo">MC</div>
+          <div>
+            <h1>Music Cover</h1>
+            <p class="lead">Adivinhe a capa da música — jogo de votação</p>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+          <div class="control" style="min-width:210px;">
+            <label for="numPlayers">Número de jogadores</label>
+            <input id="numPlayers" type="number" min="2" max="8" value="4" aria-label="Número de jogadores">
+          </div>
+
+          <div class="control" id="playersArea">
+            <label>Nomes dos jogadores</label>
+            <div id="playerInputs" class="player-list" aria-live="polite"></div>
+          </div>
+
+          <div style="align-self:flex-end;">
+            <button class="btn btn--primary" id="startBtn" aria-haspopup="true">
+              Iniciar partida
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top:6px;color:var(--muted);font-size:13px;">
+          Dica: clique numa capa para pré-visualizar — votes com números (1-4).
+        </div>
+      </header>
+
+      <!-- JOGO -->
+      <main class="game-area" id="gameArea" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div class="status">
+            <div class="left">
+              <div class="line" id="statusLine">Pronto</div>
+              <div class="small" id="roundInfo">Rodada 0 / 9</div>
+            </div>
+
+            <div class="progress" aria-hidden="true" title="Progresso">
+              <i id="progressBar" style="width:0%"></i>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn--muted" id="pauseAudio">▮▮</button>
+            <button class="btn btn--muted" id="restartBtn">Reiniciar</button>
+          </div>
+        </div>
+
+        <section class="covers" id="covers" aria-live="polite" aria-label="Capas do jogo">
+          <!-- Capas geradas aqui -->
+        </section>
+
+        <div class="vote-panel" id="votePanel" style="display:none" role="region" aria-label="Painel de votação">
+          <div>
+            <div class="instruction" id="voteLine">Votação</div>
+            <div class="small" id="voteHint">Digite a posição da capa que você acha que é a correta</div>
+          </div>
+
+          <div class="vote-input">
+            <input id="voteInput" type="text" inputmode="numeric" maxlength="1" class="hidden-input" autocomplete="off"
+              autocorrect="off" autocapitalize="off" spellcheck="false">
+            <button class="btn btn--primary" id="confirmVote">Confirmar</button>
+          </div>
+        </div>
+
+        <div class="results" id="results">
+          <div class="winner" id="winnerText">Resultado</div>
+          <div id="voteSummary" class="small">Resumo dos votos</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button class="btn btn--muted" id="nextRound" style="display:none">Próxima Rodada</button>
+            <button class="btn btn--primary" id="showScoresBtn">Ver Placar</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- SIDEBAR (right) -->
+    <aside class="sidebar">
+      <div class="score-card panel" style="padding:14px;">
+        <div class="score-header">
+          <div style="font-weight:900">Placar</div>
+          <div class="small" id="playersCount">0 jogadores</div>
+        </div>
+
+        <div class="score-list" id="scoreList" aria-live="polite">
+          <!-- itens do placar -->
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn btn--muted" id="resetScores">Zerar Placar</button>
+          <button class="btn btn--primary" id="newGame">Nova Partida</button>
+        </div>
       </div>
-      <div class="control" id="playersArea">
-        <label>Nomes dos jogadores</label>
-        <div id="playerInputs" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+
+      <div class="score-card panel small">
+        <div style="font-weight:800;margin-bottom:8px;">Configurações rápidas</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="small">Total de rodadas</label>
+          <input id="totalRounds" type="number" min="1" max="20" value="9"
+            style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff;">
+        </div>
       </div>
-      <div style="align-self:end">
-        <button class="primary" id="startBtn">Iniciar</button>
+    </aside>
+  </div>
+
+  <!-- Modal final -->
+  <div class="modal" id="finalModal" role="dialog" aria-modal="true" aria-labelledby="finalTitle" tabindex="-1">
+    <div class="modal-inner">
+      <div id="finalTitle" style="font-size:22px;font-weight:900;color:var(--accent);">Campeão</div>
+      <div id="finalBody" style="margin-top:12px;color:var(--muted)"></div>
+      <div style="margin-top:18px;display:flex;gap:12px;justify-content:flex-end;">
+        <button class="btn btn--muted" id="closeModal">Fechar</button>
+        <button class="btn btn--primary" id="modalNew">Nova Partida</button>
       </div>
     </div>
-  </header>
+  </div>
 
-  <main class="game-area" id="gameArea">
-    <div class="covers" id="covers"></div>
-    <div class="status" id="status">
-      <div class="line" id="statusLine">Pronto</div>
-      <div id="roundInfo">Rodada 0 / 5</div>
-    </div>
-
-    <div class="vote-panel" id="votePanel">
-      <div id="voteLine">Votação</div>
-      <!-- campo permanece, mas será readonly e nunca mostrará o número -->
-      <input id="voteInput" type="password" inputmode="none" maxlength="1" placeholder="1-4" readonly>
-      <div style="margin-top:10px">
-        <button id="confirmVote" class="primary">Confirmar</button>
-      </div>
-    </div>
-
-    <div class="results" id="results">
-      <div class="winner" id="winnerText"></div>
-      <div id="voteSummary"></div>
-      <div style="margin-top:12px">
-        <button id="nextRound" class="primary">Próxima Rodada</button>
-      </div>
-    </div>
-  </main>
-
-  <!-- SONS -->
+  <!-- SONS (use os seus caminhos) -->
   <audio id="bgMusic" loop src="musica_fundo.mp3"></audio>
   <audio id="fxVote" src="enter.ogg"></audio>
   <audio id="fxReveal" src="results.mp3"></audio>
   <audio id="fxRoundEnd" src="transicao.ogg"></audio>
   <audio id="fxWin" src="vitoria.mp3"></audio>
-</div>
+  <audio id="fxClick" src="click.mp3"></audio>
 
-<script>
-/* ===========================
-   Configurações iniciais
-   =========================== */
-const TOTAL_ROUNDS = 9;
-const COVER_SIZE = 400;
-const USE_PICSUM = true;
-const MUSICAS = [
-    "musicas/1 AInicio.MP3",
-    "musicas/2 All Through The Night.mp3",
-    "musicas/3 Bill Medley Jennifer Warnes - (I've Had) The ...",
-    "musicas/4 Can't Take My Eyes Off You.mp3",
-    "musicas/6 Elton John - Skyline Pigeon.mp3",
-    "musicas/7 Night Fever.mp3",
-    "musicas/8 Tony Ronald - Help (Get Me Some Help).mp3",
-    "musicas/9 Year Of The Cat - Al Stewart.mp3",
-    "musicas/10 Yellow River.mp3",
-    "musicas/11 You And Me.mp3",
-    "musicas/Baail Atoladinha.mp3",
-    "musicas/Baile Tapinha.mp3",
-    "musicas/Baile Garota Nota 100.mp3",
-    "musicas/Baile Dança da Motinha.mp3",
-    "musicas/Baile Rap do Silva.mp3",
-    "musicas/Baile Vingadora.mp3",
-    "musicas/Bailee Careless Whisper.mp3",
-    "musicas/Bailee Os Milk é Liso.mp3",
-    "musicas/Baili Glamurosa.mp3",
-    "musicas/Baille Bonde do Tigrão.mp3",
-    "musicas/Ball About That Bass.mp3",
-    "musicas/Balone.mp3",
-    "musicas/Balways.mp3",
-    "musicas/Bas Good As New.mp3",
-    "musicas/Beijo Geladinho.mp3",
-    "musicas/Blame.mp3",
-    "musicas/Bon Jovi.mp3",
-    "musicas/Boom Clap.mp3",
-    "musicas/Boys.mp3",
-    "musicas/Brasil Tchau I Have to go now.mp3",
-    "musicas/Chattahoochee.mp3",
-    "musicas/Cheia de Manias.mp3",
-    "musicas/Chiquitita.mp3",
-    "musicas/Cilada.mp3",
-    "musicas/Cold Heart.mp3",
-    "musicas/Could be love.mp3",
-    "musicas/Dancing Queen.mp3",
-    "musicas/Dancing With Myself.mp3",
-    "musicas/Depois do Prazer.mp3",
-    "musicas/Desejo de Amar.mp3",
-    "musicas/Die Young.mp3",
-    "musicas/Expresso.mp3",
-    "musicas/Dont stop the music.mp3",
-    "musicas/Dynamite.mp3",
-    "musicas/ET.mp3",
-    "musicas/Girlfriend.mp3",
-    "musicas/Fernando.mp3",
-    "musicas/Firework.mp3",
-    "musicas/Gimme! Gimme! Gimme! (A Man After Midnight).mp3",
-    "musicas/Holiday.mp3",
-    "musicas/Girls Just Want to Have Fun.mp3",
-    "musicas/Gonna make you sweet.mp3",
-    "musicas/Happy.mp3",
-    "musicas/Hips Dont Lie.mp3",
-    "musicas/I Wanna Dance with Somebody.mp3",
-    "musicas/How Deep Is Your Love .mp3",
-    "musicas/I Have A Dream.mp3",
-    "musicas/I Kissed a Girl.mp3",
-    "musicas/I Started A Joke.mp3",
-    "musicas/It Must Have Been Love.mp3",
-    "musicas/I Want To Break Free.mp3",
-    "musicas/I Will Survive.mp3",
-    "musicas/I'll Trie.mp3",
-    "musicas/Last Friday Night.mp3",
-    "musicas/It_s Raining Men.mp3",
-    "musicas/Jump.mp3",
-    "musicas/Just Dance Fatima.mp3",
-    "musicas/Knowing Me, Knowing You.mp3",
-    "musicas/Marrom Bombom.mp3",
-    "musicas/Lay All Your Love On Me.mp3",
-    "musicas/Lean on.mp3",
-    "musicas/Like A Virgin.mp3",
-    "musicas/Mamma mia.mp3",
-    "musicas/More Than A Woman.mp3",
-    "musicas/Melo de Carla Cintia.mp3",
-    "musicas/Men at Work.mp3",
-    "musicas/Money, Money, Money.mp3",
-    "musicas/One Of Us.mp3",
-    "musicas/Mr. Saxobeat.mp3",
-    "musicas/Never Gonna Give You Up.mp3",
-    "musicas/Night Fever .mp3",
-    "musicas/One Kiss.mp3",
-    "musicas/Only Girl.mp3",
-    "musicas/Pop AARadio - Copia.mp3",
-    "musicas/Pump Up The Jam.mp3",
-    "musicas/Rabiosa.mp3",
-    "musicas/Someone You Loved.mp3",
-    "musicas/Rockabye.mp3",
-    "musicas/S.O.S.mp3",
-    "musicas/Safe And Sound.mp3",
-    "musicas/Shake It Off.mp3",
-    "musicas/Take It Off.mp3",
-    "musicas/Stayin_ Alive.mp3",
-    "musicas/Stereo Love.mp3",
-    "musicas/Super Trouper.mp3",
-    "musicas/Take A Chance On Me.mp3",
-    "musicas/Thank You For The Music.mp3",
-    "musicas/Taste.mp3",
-    "musicas/Teenage Dream.mp3",
-    "musicas/Telegrama.mp3",
-    "musicas/Telephone.mp3",
-    "musicas/Too Much Heaven.mp3",
-    "musicas/The Name Of The Game.mp3",
-    "musicas/The Winner Takes It All.mp3",
-    "musicas/Tik ToK.mp3",
-    "musicas/Wake Me Up Before You Go-Go.mp3",
-    "musicas/Vamba ARadio.mp3",
-    "musicas/Voulez Vous.mp3",
-    "musicas/Voyage Voyage.mp3",
-    "musicas/Waterloo.mp3",
-    "musicas/We Found Love.mp3",
-    "musicas/We R Who We R.mp3",
-    "musicas/Worth It.mp3",
-    "musicas/You Should Be Dancing.mp3",
-    "musicas/You are not alone.mp3",
-    "musicas/Your Love.mp3"
-];
+  <script>
+    /* =========================
+       Dados e estado do jogo
+       ========================= */
+    const DEFAULT_TOTAL_ROUNDS = 9;
+    const COVER_SIZE = 600;
+    const USE_PICSUM = true;
 
-const state = {
-  playerNames: [],
-  round: 0,
-  votes: [],
-  currentVotingIndex: 0,
-  covers: [],
-  scores: {}
-};
+    // Lista curta de exemplo — substitua pela sua lista completa (mantive a variável original na sua versão)
+    const MUSICAS = [
+      "musicas/2 All Through The Night.mp3",
+      "musicas/3 Bill Medley Jennifer Warnes - (I've Had) The ...",
+      "musicas/4 Can't Take My Eyes Off You.mp3",
+      "musicas/6 Elton John - Skyline Pigeon.mp3",
+      "musicas/7 Night Fever.mp3",
+      "musicas/8 Tony Ronald - Help (Get Me Some Help).mp3",
+      "musicas/9 Year Of The Cat - Al Stewart.mp3",
+      "musicas/10 Yellow River.mp3",
+      "musicas/11 You And Me.mp3",
+      "musicas/Baail Atoladinha.mp3",
+      "musicas/Baile Tapinha.mp3",
+      "musicas/Baile Garota Nota 100.mp3",
+      "musicas/Baile Dança da Motinha.mp3",
+      "musicas/Baile Rap do Silva.mp3",
+      "musicas/Baile Vingadora.mp3",
+      "musicas/Bailee Careless Whisper.mp3",
+      "musicas/Bailee Os Milk é Liso.mp3",
+      "musicas/Baili Glamurosa.mp3",
+      "musicas/Baille Bonde do Tigrão.mp3",
+      "musicas/Ball About That Bass.mp3",
+      "musicas/Balone.mp3",
+      "musicas/Balways.mp3",
+      "musicas/Bas Good As New.mp3",
+      "musicas/Beijo Geladinho.mp3",
+      "musicas/Blame.mp3",
+      "musicas/Bon Jovi.mp3",
+      "musicas/Boom Clap.mp3",
+      "musicas/Boys.mp3",
+      "musicas/Brasil Tchau I Have to go now.mp3",
+      "musicas/Chattahoochee.mp3",
+      "musicas/Cheia de Manias.mp3",
+      "musicas/Chiquitita.mp3",
+      "musicas/Cilada.mp3",
+      "musicas/Cold Heart.mp3",
+      "musicas/Could be love.mp3",
+      "musicas/Dancing Queen.mp3",
+      "musicas/Dancing With Myself.mp3",
+      "musicas/Depois do Prazer.mp3",
+      "musicas/Desejo de Amar.mp3",
+      "musicas/Die Young.mp3",
+      "musicas/Expresso.mp3",
+      "musicas/Dont stop the music.mp3",
+      "musicas/Dynamite.mp3",
+      "musicas/ET.mp3",
+      "musicas/Girlfriend.mp3",
+      "musicas/Fernando.mp3",
+      "musicas/Firework.mp3",
+      "musicas/Gimme! Gimme! Gimme! (A Man After Midnight).mp3",
+      "musicas/Holiday.mp3",
+      "musicas/Girls Just Want to Have Fun.mp3",
+      "musicas/Gonna make you sweet.mp3",
+      "musicas/Happy.mp3",
+      "musicas/Hips Dont Lie.mp3",
+      "musicas/I Wanna Dance with Somebody.mp3",
+      "musicas/How Deep Is Your Love .mp3",
+      "musicas/I Have A Dream.mp3",
+      "musicas/I Kissed a Girl.mp3",
+      "musicas/I Started A Joke.mp3",
+      "musicas/It Must Have Been Love.mp3",
+      "musicas/I Want To Break Free.mp3",
+      "musicas/I Will Survive.mp3",
+      "musicas/I'll Trie.mp3",
+      "musicas/Last Friday Night.mp3",
+      "musicas/It_s Raining Men.mp3",
+      "musicas/Jump.mp3",
+      "musicas/Just Dance Fatima.mp3",
+      "musicas/Knowing Me, Knowing You.mp3",
+      "musicas/Marrom Bombom.mp3",
+      "musicas/Lay All Your Love On Me.mp3",
+      "musicas/Lean on.mp3",
+      "musicas/Like A Virgin.mp3",
+      "musicas/Mamma mia.mp3",
+      "musicas/More Than A Woman.mp3",
+      "musicas/Melo de Carla Cintia.mp3",
+      "musicas/Men at Work.mp3",
+      "musicas/Money, Money, Money.mp3",
+      "musicas/One Of Us.mp3",
+      "musicas/Mr. Saxobeat.mp3",
+      "musicas/Never Gonna Give You Up.mp3",
+      "musicas/Night Fever .mp3",
+      "musicas/One Kiss.mp3",
+      "musicas/Only Girl.mp3",
+      "musicas/Pop AARadio - Copia.mp3",
+      "musicas/Pump Up The Jam.mp3",
+      "musicas/Rabiosa.mp3",
+      "musicas/Someone You Loved.mp3",
+      "musicas/Rockabye.mp3",
+      "musicas/S.O.S.mp3",
+      "musicas/Safe And Sound.mp3",
+      "musicas/Shake It Off.mp3",
+      "musicas/Take It Off.mp3",
+      "musicas/Stayin_ Alive.mp3",
+      "musicas/Stereo Love.mp3",
+      "musicas/Super Trouper.mp3",
+      "musicas/Take A Chance On Me.mp3",
+      "musicas/Thank You For The Music.mp3",
+      "musicas/Taste.mp3",
+      "musicas/Teenage Dream.mp3",
+      "musicas/Telegrama.mp3",
+      "musicas/Telephone.mp3",
+      "musicas/Too Much Heaven.mp3",
+      "musicas/The Name Of The Game.mp3",
+      "musicas/The Winner Takes It All.mp3",
+      "musicas/Tik ToK.mp3",
+      "musicas/Wake Me Up Before You Go-Go.mp3",
+      "musicas/Vamba ARadio.mp3",
+      "musicas/Voulez Vous.mp3",
+      "musicas/Voyage Voyage.mp3",
+      "musicas/Waterloo.mp3",
+      "musicas/We Found Love.mp3",
+      "musicas/We R Who We R.mp3",
+      "musicas/Worth It.mp3",
+      "musicas/You Should Be Dancing.mp3",
+      "musicas/You are not alone.mp3",
+      "musicas/Your Love.mp3"
+    ];
 
-// elementos DOM
-const numPlayersInput = document.getElementById('numPlayers');
-const startBtn = document.getElementById('startBtn');
-const startScreen = document.getElementById('startScreen');
-const gameArea = document.getElementById('gameArea');
-const coversEl = document.getElementById('covers');
-const statusLine = document.getElementById('statusLine');
-const roundInfo = document.getElementById('roundInfo');
-const votePanel = document.getElementById('votePanel');
-const voteLine = document.getElementById('voteLine');
-const voteInput = document.getElementById('voteInput');
-const confirmVote = document.getElementById('confirmVote');
-const resultsEl = document.getElementById('results');
-const winnerText = document.getElementById('winnerText');
-const voteSummary = document.getElementById('voteSummary');
-const nextRoundBtn = document.getElementById('nextRound');
+    const state = {
+      playerNames: [],
+      round: 0,
+      votes: [],
+      currentVotingIndex: 0,
+      covers: [],
+      scores: {},
+      totalRounds: DEFAULT_TOTAL_ROUNDS,
+    };
 
-const audioBg = document.getElementById('bgMusic');
-const fxVote = document.getElementById('fxVote');
-const fxReveal = document.getElementById('fxReveal');
-const fxRoundEnd = document.getElementById('fxRoundEnd');
-const fxWin = document.getElementById('fxWin');
-const fxClick = new Audio('click.mp3');
+    /* =========================
+       Elementos DOM
+       ========================= */
+    const numPlayersInput = document.getElementById('numPlayers');
+    const startBtn = document.getElementById('startBtn');
+    const startScreen = document.getElementById('startScreen');
+    const gameArea = document.getElementById('gameArea');
+    const coversEl = document.getElementById('covers');
+    const statusLine = document.getElementById('statusLine');
+    const roundInfo = document.getElementById('roundInfo');
+    const votePanel = document.getElementById('votePanel');
+    const voteLine = document.getElementById('voteLine');
+    const voteInput = document.getElementById('voteInput');
+    const confirmVote = document.getElementById('confirmVote');
+    const resultsEl = document.getElementById('results');
+    const winnerText = document.getElementById('winnerText');
+    const voteSummary = document.getElementById('voteSummary');
+    const nextRoundBtn = document.getElementById('nextRound');
+    const progressBar = document.getElementById('progressBar');
+    const scoreList = document.getElementById('scoreList');
+    const playersCount = document.getElementById('playersCount');
+    const totalRoundsInput = document.getElementById('totalRounds');
+    const pauseAudioBtn = document.getElementById('pauseAudio');
+    const restartBtn = document.getElementById('restartBtn');
+    const resetScoresBtn = document.getElementById('resetScores');
+    const newGameBtn = document.getElementById('newGame');
+    const showScoresBtn = document.getElementById('showScoresBtn');
+    const finalModal = document.getElementById('finalModal');
+    const finalBody = document.getElementById('finalBody');
+    const closeModal = document.getElementById('closeModal');
+    const modalNew = document.getElementById('modalNew');
 
-/* ---------------------------
-   Inputs dos jogadores
-   --------------------------- */
-function renderPlayerInputs() {
-  const num = parseInt(numPlayersInput.value) || 2;
-  const playerInputs = document.getElementById('playerInputs');
-  playerInputs.innerHTML = '';
-  for (let i = 0; i < num; i++) {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = `Jogador ${i + 1}`;
-    input.className = 'player-name';
-    playerInputs.appendChild(input);
-  }
-}
-numPlayersInput.oninput = renderPlayerInputs;
-renderPlayerInputs();
+    const audioBg = document.getElementById('bgMusic');
+    const fxVote = document.getElementById('fxVote');
+    const fxReveal = document.getElementById('fxReveal');
+    const fxRoundEnd = document.getElementById('fxRoundEnd');
+    const fxWin = document.getElementById('fxWin');
+    const fxClick = document.getElementById('fxClick');
 
-/* ---------------------------
-   Iniciar jogo
-   --------------------------- */
-startBtn.onclick = () => {
-  fxClick.currentTime = 0; fxClick.play();
-  const inputs = [...document.querySelectorAll('.player-name')];
-  const names = inputs.map(i => i.value.trim()).filter(v => v);
-  if (names.length < 2) return alert('Digite pelo menos 2 nomes de jogadores!');
-  state.playerNames = names;
-  startScreen.style.display = 'none';
-  gameArea.style.display = 'block';
-  state.round = 0;
-  state.scores = {};
-  names.forEach(n => state.scores[n] = 0);
-  nextRound();
-};
+    /* =========================
+       Helpers UI
+       ========================= */
+    function setStatus(text) { statusLine.textContent = text; }
+    function setRoundInfo() { roundInfo.textContent = `Rodada ${state.round} / ${state.totalRounds}`; }
+    function updateProgress() { const p = Math.round((state.round / Math.max(1, state.totalRounds)) * 100); progressBar.style.width = p + '%'; }
 
-/* ---------------------------
-   Gerar / renderizar capas
-   --------------------------- */
-function gerarCovers() {
-  const urls = [];
-  for (let i = 0; i < 4; i++) {
-    urls.push(USE_PICSUM
-      ? `https://picsum.photos/${COVER_SIZE}?random=${Date.now()}-${i}`
-      : `https://source.unsplash.com/${COVER_SIZE}x${COVER_SIZE}/?album,music&sig=${Math.random()*9999}`);
-  }
-  return urls;
-}
-function renderCovers(){
-  coversEl.innerHTML = '';
-  state.covers.forEach((url,i)=>{
-    const c = document.createElement('div');
-    c.className = 'cover';
-    c.innerHTML = `<img src="${url}" alt="Capa ${i+1}">`;
-    coversEl.appendChild(c);
-  });
-}
+    /* =========================
+       Player inputs
+       ========================= */
+    function renderPlayerInputs() {
+      const num = Math.max(2, Math.min(8, parseInt(numPlayersInput.value || 4)));
+      const container = document.getElementById('playerInputs');
+      container.innerHTML = '';
+      for (let i = 0; i < num; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = `Jogador ${i + 1}`;
+        input.className = 'player-name';
+        input.style.padding = '8px';
+        input.style.borderRadius = '8px';
+        input.style.border = '1px solid rgba(255,255,255,0.04)';
+        input.style.background = 'transparent';
+        input.style.color = '#fff';
+        input.style.minWidth = '120px';
+        container.appendChild(input);
+      }
+    }
+    numPlayersInput.addEventListener('input', renderPlayerInputs);
+    renderPlayerInputs();
 
-/* ---------------------------
-   Próxima rodada
-   --------------------------- */
-function nextRound(){
-  resultsEl.style.display = 'none';
-  votePanel.style.display = 'none';
-  state.round++;
-  if (state.round > TOTAL_ROUNDS) return showFinalResults();
+    /* =========================
+       Iniciar jogo
+       ========================= */
+    startBtn.addEventListener('click', () => {
+      fxClick?.play().catch(() => { });
+      const inputs = [...document.querySelectorAll('.player-name')];
+      const names = inputs.map(i => i.value.trim()).filter(Boolean);
+      if (names.length < 2) { alert('Digite pelo menos 2 nomes de jogadores!'); return; }
 
-  roundInfo.textContent = `Rodada ${state.round} / ${TOTAL_ROUNDS}`;
-  statusLine.textContent = 'Gerando capas...';
+      state.playerNames = names;
+      state.totalRounds = parseInt(totalRoundsInput.value) || DEFAULT_TOTAL_ROUNDS;
+      state.round = 0;
+      state.votes = [];
+      state.covers = [];
+      state.currentVotingIndex = 0;
+      state.scores = {};
+      state.playerNames.forEach(n => state.scores[n] = 0);
 
-  const musica = MUSICAS[Math.floor(Math.random()*MUSICAS.length)];
-  audioBg.src = musica;
-  audioBg.play().catch(()=>{});
+      playersCount.textContent = `${state.playerNames.length} jogadores`;
+      renderScores();
+      startScreen.style.display = 'none';
+      gameArea.style.display = 'flex';
+      nextRound();
+      audioBg.play().catch(() => { });
+    });
 
-  state.covers = gerarCovers();
-  renderCovers();
+    /* =========================
+       Gerar capas (URLs)
+       ========================= */
+    function gerarCovers() {
+      const urls = [];
+      for (let i = 0; i < 4; i++) {
+        if (USE_PICSUM) {
+          urls.push(`https://picsum.photos/${COVER_SIZE}?random=${Date.now()}-${i}`);
+        } else {
+          urls.push(`https://source.unsplash.com/${COVER_SIZE}x${COVER_SIZE}/?album,music&sig=${Math.random() * 10000}`);
+        }
+      }
+      return urls;
+    }
 
-  state.votes[state.round - 1] = Array(state.playerNames.length).fill(null);
-  state.currentVotingIndex = 0;
+    function renderCovers() {
+      coversEl.innerHTML = '';
+      state.covers.forEach((url, idx) => {
+        const c = document.createElement('div');
+        c.className = 'cover';
+        c.innerHTML = `
+          <span class="badge">${idx + 1}</span>
+          <img src="${url}" alt="Capa ${idx + 1}" loading="lazy">
+        `;
+        c.addEventListener('click', () => {
+          // pré-visualizar (pequena animação)
+          c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duration: 420 });
+        });
+        coversEl.appendChild(c);
+      });
+    }
 
-  setTimeout(()=>{
-    statusLine.textContent = 'Iniciando votação';
-    iniciarVotacao();
-  },700);
-}
+    /* =========================
+       Round flow
+       ========================= */
+    function nextRound() {
+      resultsEl.style.display = 'none';
+      votePanel.style.display = 'none';
+      state.round++;
+      if (state.round > state.totalRounds) return showFinalResults();
 
-/* ---------------------------
-   Votação (secreta)
-   --------------------------- */
-function iniciarVotacao(){
-  voteInput.value = '';
-  // garante que nada aparece e que input não abre teclado
-  voteInput.setAttribute('readonly','true');
-  voteInput.setAttribute('inputmode','none');
-  voteInput.blur();
-  votePanel.style.display = 'block';
-  mostrarJogador();
-}
+      setRoundInfo();
+      updateProgress();
+      setStatus('Gerando capas e escolhendo música...');
+      // escolhe música aleatória (se houver)
+      const musica = MUSICAS[Math.floor(Math.random() * MUSICAS.length)] || audioBg.src;
+      if (musica) { audioBg.src = musica; audioBg.play().catch(() => { }); }
 
-function mostrarJogador(){
-  const i = state.currentVotingIndex;
-  const nome = state.playerNames[i];
-  voteLine.textContent = `É a vez de ${nome}`;
-  statusLine.textContent = `Jogador ${i+1}: ${nome} votando`;
-  voteInput.blur(); // evita foco no mobile
-}
+      state.covers = gerarCovers();
+      renderCovers();
+      state.votes[state.round - 1] = Array(state.playerNames.length).fill(null);
+      state.currentVotingIndex = 0;
 
-/* Confirmar via botão (compatibilidade) */
-confirmVote.onclick = () => {
-  // lê voto "secreto" do dataset (preenchido pelo keydown)
-  const val = voteInput.dataset.secretVote;
-  if (!/^[1-4]$/.test(val)) return alert('Vote entre 1 e 4!');
-  state.votes[state.round - 1][state.currentVotingIndex] = parseInt(val,10);
-  voteInput.dataset.secretVote = '';
-  fxVote.currentTime = 0; fxVote.play();
+      // pequena espera para fluidez
+      setTimeout(() => {
+        setStatus('Iniciando votação');
+        iniciarVotacao();
+      }, 600);
+    }
 
-  state.currentVotingIndex++;
-  if (state.currentVotingIndex >= state.playerNames.length) {
-    fxRoundEnd.currentTime = 0; fxRoundEnd.play();
-    finalizarVotacao();
-  } else {
-    mostrarJogador();
-  }
-};
-
-/* ---------------------------
-   Captura de teclas: totalmente secreta
-   - NUNCA escreve no campo
-   - NUNCA abre teclado virtual
-   - 1-4 registra voto imediatamente (sem mostrar)
-   - Enter: se resultados mostrados -> próxima rodada
-            se votação e houver voto no dataset -> confirma
-   --------------------------- */
-document.addEventListener('keydown', e => {
-  // se estiver na tela de resultados, Enter avança
-  if (resultsEl.style.display === 'block' && e.key === 'Enter') {
-    e.preventDefault();
-    fxClick.currentTime = 0; fxClick.play();
-    nextRound();
-    return;
-  }
-
-  if (votePanel.style.display !== 'block') return;
-
-  // aceitamos apenas 1 a 4
-  if (/^[1-4]$/.test(e.key)) {
-    e.preventDefault();
-    // salva secretamente (não mostra)
-    voteInput.dataset.secretVote = e.key;
-    // toca som e processa como confirmação imediata
-    state.votes[state.round - 1][state.currentVotingIndex] = parseInt(e.key,10);
-    voteInput.dataset.secretVote = '';
-    fxVote.currentTime = 0; fxVote.play();
-
-    state.currentVotingIndex++;
-    if (state.currentVotingIndex >= state.playerNames.length) {
-      fxRoundEnd.currentTime = 0; fxRoundEnd.play();
-      finalizarVotacao();
-    } else {
+    /* =========================
+       Votação
+       ========================= */
+    function iniciarVotacao() {
+      voteInput.value = '';
+      votePanel.style.display = 'block';
+      voteInput.blur(); // evita teclado antecipado
+      setTimeout(() => {
+        voteInput.focus();
+      }, 200);
       mostrarJogador();
     }
-    return;
-  }
 
-  // se quiser confirmar por Enter (opcional)
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    // só confirma se já houver vote no dataset
-    const val = voteInput.dataset.secretVote;
-    if (/^[1-4]$/.test(val)) {
-      confirmVote.click();
+    function mostrarJogador() {
+      const i = state.currentVotingIndex;
+      const nome = state.playerNames[i];
+      voteLine.textContent = `É a vez de ${nome}`;
+      statusLine.textContent = `Jogador ${i + 1}: ${nome} votando`;
+      voteInput.value = '';
+      voteInput.focus();
     }
-  }
-});
 
-/* ---------------------------
-   Finalizar votação
-   --------------------------- */
-function finalizarVotacao(){
-  votePanel.style.display = 'none';
-  statusLine.textContent = 'Finalização da votação...';
+    confirmVote.onclick = () => {
+      const val = voteInput.value.trim();
+      if (!/^[1-4]$/.test(val)) return alert('Vote entre 1 e 4!');
 
-  const msg = document.createElement('div');
-  msg.textContent = 'FINALIZAÇÃO DA VOTAÇÃO';
-  Object.assign(msg.style,{
-    position:'fixed',left:'50%',top:'30%',transform:'translateX(-50%)',
-    background:'rgba(0,0,0,0.7)',padding:'20px 30px',borderRadius:'10px',fontWeight:'800',color:'#fff',zIndex:99999
-  });
-  document.body.appendChild(msg);
-  msg.animate([{opacity:0},{opacity:1},{opacity:0}],{duration:1600});
-  setTimeout(()=>{document.body.removeChild(msg); revealResults();},1600);
-}
+      state.votes[state.round - 1][state.currentVotingIndex] = parseInt(val);
+      fxVote.currentTime = 0;
+      fxVote.play();
 
-/* ---------------------------
-   Revelar resultados da rodada
-   --------------------------- */
-function revealResults(){
-  fxReveal.currentTime = 0; fxReveal.play();
+      state.currentVotingIndex++;
+      if (state.currentVotingIndex >= state.playerNames.length) {
+        fxRoundEnd.currentTime = 0;
+        fxRoundEnd.play();
+        finalizarVotacao();
+      } else {
+        voteInput.value = '';
+        mostrarJogador();
+      }
+    };
 
-  const votesThisRound = state.votes[state.round - 1] || [];
-  const totalCovers = state.covers.length;
-  const counts = new Array(totalCovers).fill(0);
-  votesThisRound.forEach(v => {
-    const n = parseInt(v,10);
-    if (!isNaN(n) && n >=1 && n <= totalCovers) counts[n-1]++;
-  });
+    voteInput.onkeydown = e => {
+      if (e.key === 'Enter') confirmVote.click();
+    };
 
-  const maxVotes = Math.max(...counts);
-  const winners = counts.map((c,i) => (c === maxVotes ? i : null)).filter(i => i !== null);
-
-  const coverEls = Array.from(document.querySelectorAll('.cover'));
-  coverEls.forEach((el,idx) => {
-    if (winners.includes(idx)) {
-      el.style.transform = 'scale(1.07)';
-      el.style.boxShadow = '0 8px 30px rgba(255,215,0,0.6)';
-      el.style.opacity = 1;
-    } else {
-      el.style.opacity = 0.4;
-      el.style.transform = '';
-      el.style.boxShadow = '';
+    /* =========================
+       Finalizar votacao e revelar
+       ========================= */
+    function finalizarVotacao() {
+      votePanel.style.display = 'none';
+      setStatus('Finalizando votação...');
+      // animação simples
+      const msg = document.createElement('div');
+      msg.textContent = 'FINALIZAÇÃO DA VOTAÇÃO';
+      Object.assign(msg.style, {
+        position: 'fixed', left: '50%', top: '28%', transform: 'translateX(-50%)',
+        background: 'rgba(0,0,0,0.7)', padding: '16px 22px', borderRadius: '10px', fontWeight: 900, zIndex: 9999
+      });
+      document.body.appendChild(msg);
+      msg.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 1400 });
+      setTimeout(() => { document.body.removeChild(msg); revealResults(); }, 1400);
     }
-  });
 
-  const vencedoresRodada = [];
-  state.playerNames.forEach((nome,i) => {
-    const voto = parseInt(votesThisRound[i]);
-    if (winners.includes(voto-1)) {
-      state.scores[nome] = (state.scores[nome] || 0) + 1;
-      vencedoresRodada.push(nome);
+    function revealResults() {
+      fxReveal.currentTime = 0; fxReveal.play().catch(() => { });
+      const votesThisRound = state.votes[state.round - 1] || [];
+      const totalCovers = state.covers.length;
+      const counts = new Array(totalCovers).fill(0);
+      votesThisRound.forEach(v => {
+        const n = parseInt(v, 10);
+        if (!isNaN(n) && n >= 1 && n <= totalCovers) counts[n - 1]++;
+      });
+
+      const maxVotes = Math.max(...counts);
+      const winners = counts.map((c, i) => c === maxVotes ? i : null).filter(i => i !== null);
+
+      // Destaque visual nas capas
+      const coverEls = Array.from(document.querySelectorAll('.cover'));
+      coverEls.forEach((el, idx) => {
+        el.style.transition = 'transform .45s, opacity .45s, box-shadow .45s';
+        if (winners.includes(idx)) {
+          el.style.transform = 'scale(1.06)';
+          el.style.boxShadow = '0 18px 50px rgba(255,179,58,0.14)';
+          el.style.opacity = '1';
+        } else {
+          el.style.opacity = '0.35';
+          el.style.transform = '';
+          el.style.boxShadow = '';
+        }
+      });
+
+      // atualizar pontuação
+      const vencedoresRodada = [];
+      state.playerNames.forEach((nome, i) => {
+        const voto = parseInt(votesThisRound[i]);
+        if (winners.includes(voto - 1)) {
+          state.scores[nome] = (state.scores[nome] || 0) + 1;
+          vencedoresRodada.push(nome);
+        }
+      });
+
+      resultsEl.style.display = 'flex';
+      let textoCapa = '';
+      if (maxVotes === 0) textoCapa = 'Nenhum voto válido nesta rodada.';
+      else if (winners.length === 1) textoCapa = `Capa vencedora: ${winners[0] + 1} com ${maxVotes} voto(s)!`;
+      else textoCapa = `Empate entre capas: ${winners.map(i => i + 1).join(', ')} (${maxVotes} voto(s) cada)`;
+
+      winnerText.textContent = textoCapa;
+      voteSummary.innerHTML = vencedoresRodada.length > 0
+        ? `🏆 Jogadores que pontuaram: <strong style="color:var(--accent)">${vencedoresRodada.join(', ')}</strong>`
+        : `Ninguém pontuou nesta rodada 😢`;
+
+      nextRoundBtn.style.display = 'inline-block';
+      showScoresBtn.style.display = 'inline-block';
+
+      renderScores();
     }
-  });
 
-  resultsEl.style.display = 'block';
-  let textoCapa = '';
-  if (maxVotes === 0) textoCapa = 'Nenhum voto válido nesta rodada.';
-  else if (winners.length === 1) textoCapa = `Capa vencedora: ${winners[0] + 1} com ${maxVotes} voto(s)!`;
-  else textoCapa = `Empate entre capas: ${winners.map(i => i+1).join(', ')} (${maxVotes} voto(s) cada)`;
+    nextRoundBtn.addEventListener('click', () => {
+      fxClick?.play().catch(() => { });
+      nextRound();
+    });
 
-  winnerText.innerHTML = `<div style="font-size:1.6em;font-weight:800;color:#ffb400;margin-bottom:10px;text-shadow:0 0 10px rgba(0,0,0,0.6);">${textoCapa}</div>`;
+    /* =========================
+       Placar (sidebar)
+       ========================= */
+    function renderScores() {
+      scoreList.innerHTML = '';
+      const entries = Object.entries(state.scores || {});
+      entries.sort((a, b) => b[1] - a[1]);
+      entries.forEach(([name, points]) => {
+        const item = document.createElement('div');
+        item.className = 'score-item';
+        item.innerHTML = `<span>${name}</span><span style="font-weight:900">${points}</span>`;
+        scoreList.appendChild(item);
+      });
+    }
 
-  if (vencedoresRodada.length > 0) {
-    voteSummary.innerHTML = `<div style="font-size:1em;font-weight:600;color:#e5e5e5;margin-top:8px;text-shadow:0 0 5px rgba(0,0,0,0.5);">🏆 Jogadores que pontuaram: <span style="color:#ffda6a">${vencedoresRodada.join(', ')}</span></div>`;
-  } else {
-    voteSummary.innerHTML = `<div style="font-size:1em;opacity:0.8;margin-top:8px;">Ninguém acertou nesta rodada 😢</div>`;
-  }
+    resetScoresBtn.addEventListener('click', () => {
+      fxClick?.play().catch(() => { });
+      state.playerNames.forEach(n => state.scores[n] = 0);
+      renderScores();
+    });
 
-  nextRoundBtn.style.display = 'inline-block';
-}
+    newGameBtn.addEventListener('click', () => {
+      fxClick?.play().catch(() => { });
+      // volta pra tela inicial e mantém nomes
+      startScreen.style.display = 'block';
+      gameArea.style.display = 'none';
+      setStatus('Pronto');
+    });
 
-/* ---------------------------
-   Botão próxima rodada
-   --------------------------- */
-nextRoundBtn.onclick = () => {
-  fxClick.currentTime = 0; fxClick.play();
-  nextRound();
-};
+    showScoresBtn.addEventListener('click', () => {
+      // abrir modal simples com placar
+      finalBody.innerHTML = `<div style="font-weight:800;margin-bottom:8px">Placar Atual</div>
+        <div>${Object.entries(state.scores).map(([n, p]) => `${n}: ${p} ponto(s)`).join(' — ')}</div>`;
+      finalModal.classList.add('show');
+    });
 
-/* ---------------------------
-   Resultados finais (tela original preservada)
-   --------------------------- */
-function showFinalResults() {
-  const maxScore = Math.max(...Object.values(state.scores));
-  const campeoes = Object.entries(state.scores)
-    .filter(([_, p]) => p === maxScore)
-    .map(([n]) => n);
+    closeModal.addEventListener('click', () => finalModal.classList.remove('show'));
+    modalNew.addEventListener('click', () => {
+      finalModal.classList.remove('show');
+      // reinicia partida e zera pontuação
+      reiniciarPartida(true);
+    });
 
-  const texto = campeoes.length > 1 ? `Empate entre ${campeoes.join(', ')}` : `Campeão: ${campeoes[0]}!`;
-  const placar = Object.entries(state.scores)
-    .map(([n,p]) => `${n}: ${p} ponto(s)`).join(' — ');
+    /* =========================
+       Final do jogo
+       ========================= */
+    function showFinalResults() {
+      // determinar campeões
+      const scores = state.scores;
+      const maxScore = Math.max(...Object.values(scores));
+      const campeoes = Object.entries(scores).filter(([_, p]) => p === maxScore).map(([n]) => n);
+      const texto = campeoes.length > 1 ? `Empate entre ${campeoes.join(', ')}` : `Campeão: ${campeoes[0]}!`;
+      finalBody.innerHTML = `<div style="font-size:20px;font-weight:900;color:var(--accent)">${texto}</div>
+        <div style="margin-top:12px;color:var(--muted)">${Object.entries(scores).map(([n, p]) => `${n}: ${p} ponto(s)`).join(' — ')}</div>
+        <div style="margin-top:12px;color:var(--muted)">Obrigado por jogar!</div>`;
+      finalModal.classList.add('show');
+      fxWin.currentTime = 0; fxWin.play().catch(() => { });
+      confete();
+    }
 
-  const overlay = document.createElement('div');
-  Object.assign(overlay.style, {
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)',
-    color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center',
-    justifyContent: 'center', fontSize: '2em', zIndex: 9999, animation: 'fadeIn 1.5s'
-  });
-  overlay.innerHTML = `<div style="text-align:center">
-    <div style="font-size:2.5em;color:#ffb400;font-weight:900;">🏆 ${texto}</div>
-    <div style="margin-top:20px;font-size:1.2em;">${placar}</div>
-    <div style="margin-top:40px;font-size:0.7em;opacity:0.8;">Obrigado por jogar!</div>
-  </div>`;
+    /* =========================
+       Reiniciar / confete
+       ========================= */
+    function reiniciarPartida(zeraPontuacao = false) {
+      fxClick?.play().catch(() => { });
+      state.round = 0;
+      state.votes = [];
+      state.covers = [];
+      state.currentVotingIndex = 0;
+      if (zeraPontuacao) {
+        state.scores = {};
+        state.playerNames.forEach(n => state.scores[n] = 0);
+        renderScores();
+      }
+      resultsEl.style.display = 'none';
+      votePanel.style.display = 'none';
+      setStatus('Preparando nova partida...');
+      setTimeout(nextRound, 500);
+      stopConfete();
+    }
 
-  const btn = document.createElement('button');
-  btn.textContent = "Nova Partida";
-  btn.className = "primary";
-  btn.style.marginTop = "20px";
-  btn.onclick = () => {
-    document.body.removeChild(overlay);
-    reiniciarPartida(true);
-  };
-  overlay.querySelector('div').appendChild(btn);
+    restartBtn.addEventListener('click', () => reiniciarPartida(false));
 
-  document.body.appendChild(overlay);
-  fxWin.currentTime = 0; fxWin.play();
-  confete();
-}
+    /* =========================
+       Audio controls
+       ========================= */
+    pauseAudioBtn.addEventListener('click', () => {
+      if (audioBg.paused) { audioBg.play().catch(() => { }); pauseAudioBtn.textContent = '▮▮'; }
+      else { audioBg.pause(); pauseAudioBtn.textContent = '▶'; }
+    });
 
-/* ---------------------------
-   Reiniciar partida
-   --------------------------- */
-function reiniciarPartida(zeraPontuacao = false) {
-  fxClick.currentTime = 0; fxClick.play();
+    /* =========================
+       Confete (simples)
+       ========================= */
+    let confeteCanvas = null;
+    let confeteAnimId = null;
 
-  state.round = 0;
-  state.votes = [];
-  state.covers = [];
-  state.currentVotingIndex = 0;
+    function confete() {
+      stopConfete();
+      confeteCanvas = document.createElement('canvas');
+      confeteCanvas.width = innerWidth;
+      confeteCanvas.height = innerHeight;
+      confeteCanvas.style.position = 'fixed';
+      confeteCanvas.style.inset = 0;
+      confeteCanvas.style.pointerEvents = 'none';
+      confeteCanvas.style.zIndex = 99999;
+      document.body.appendChild(confeteCanvas);
+      const ctx = confeteCanvas.getContext('2d');
+      const confs = Array.from({ length: 150 }).map(() => ({
+        x: Math.random() * innerWidth,
+        y: Math.random() * -innerHeight,
+        r: 3 + Math.random() * 6,
+        d: Math.random() * 3 + 2,
+        c: `hsl(${Math.random() * 360},100%,60%)`
+      }));
+      function draw() {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        confs.forEach(p => {
+          ctx.beginPath();
+          ctx.fillStyle = p.c;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          p.y += p.d;
+          if (p.y > innerHeight) { p.y = -10; p.x = Math.random() * innerWidth; }
+        });
+        confeteAnimId = requestAnimationFrame(draw);
+      }
+      draw();
+      // para após 6s
+      setTimeout(stopConfete, 6000);
+    }
 
-  if (zeraPontuacao) {
-    state.scores = {};
-    state.playerNames.forEach(n => state.scores[n] = 0);
-  }
+    function stopConfete() {
+      if (confeteCanvas) {
+        cancelAnimationFrame(confeteAnimId);
+        try { document.body.removeChild(confeteCanvas); } catch (e) { }
+        confeteCanvas = null; confeteAnimId = null;
+      }
+    }
 
-  resultsEl.style.display = 'none';
-  votePanel.style.display = 'none';
-  roundInfo.textContent = `Rodada 0 / ${TOTAL_ROUNDS}`;
-  statusLine.textContent = 'Preparando nova partida...';
+    /* =========================
+       Inicializações
+       ========================= */
+    // enterrar listeners que usam elementos carregados
+    document.addEventListener('DOMContentLoaded', () => {
+      totalRoundsInput.value = DEFAULT_TOTAL_ROUNDS;
+      // controles rápidos de debug
+      document.getElementById('playersCount').textContent = '0 jogadores';
+    });
 
-  setTimeout(nextRound, 500);
-}
+    // pequenas proteções de usabilidade
+    window.addEventListener('resize', () => {
+      if (confeteCanvas) { confeteCanvas.width = innerWidth; confeteCanvas.height = innerHeight; }
+    });
 
-/* ---------------------------
-   Confete (canvas)
-   --------------------------- */
-let confeteCanvas = null;
-let confeteAnimId = null;
+    // impede submissão por engano
+    document.addEventListener('submit', e => e.preventDefault());
 
-function confete() {
-  // limpa confete anterior
-  if (confeteCanvas) {
-    cancelAnimationFrame(confeteAnimId);
-    document.body.removeChild(confeteCanvas);
-    confeteCanvas = null;
-    confeteAnimId = null;
-  }
-
-  confeteCanvas = document.createElement('canvas');
-  confeteCanvas.width = innerWidth;
-  confeteCanvas.height = innerHeight;
-  confeteCanvas.style.position = 'fixed';
-  confeteCanvas.style.inset = 0;
-  confeteCanvas.style.pointerEvents = 'none';
-  confeteCanvas.style.zIndex = 99999;
-  document.body.appendChild(confeteCanvas);
-  const ctx = confeteCanvas.getContext('2d');
-
-  const confs = Array.from({ length: 150 }).map(() => ({
-    x: Math.random() * innerWidth,
-    y: Math.random() * -innerHeight,
-    r: 3 + Math.random() * 6,
-    d: Math.random() * 3 + 2,
-    c: `hsl(${Math.random() * 360},100%,60%)`
-  }));
-
-  function draw() {
-    ctx.clearRect(0,0,innerWidth,innerHeight);
-    confs.forEach(p => {
-      ctx.beginPath();
-      ctx.fillStyle = p.c;
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
-      p.y += p.d;
-      if (p.y > innerHeight) {
-        p.y = -10;
-        p.x = Math.random() * innerWidth;
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && resultsEl.style.display === 'block') {
+        e.preventDefault();
+        nextRoundBtn.click();
       }
     });
-    confeteAnimId = requestAnimationFrame(draw);
-  }
-  draw();
-}
 
-/* fim do script */
-</script>
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Cria partículas tipo "quadradinhos brilhando"
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 4 + 1,
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.5,
+        alpha: Math.random() * 0.5 + 0.3
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // efeito de brilho central
+      const gradient = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 100,
+        canvas.width / 2, canvas.height / 2, canvas.width / 1.2
+      );
+      gradient.addColorStop(0, "rgba(255, 200, 0, 0.5)");
+      gradient.addColorStop(0.4, "rgba(255, 120, 0, 0.3)");
+      gradient.addColorStop(1, "rgba(255, 50, 0, 0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // partículas animadas
+      for (let p of particles) {
+        ctx.fillStyle = `rgba(255, ${150 + Math.random() * 100}, 0, ${p.alpha})`;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+  </script>
 </body>
+
 </html>
