@@ -12,451 +12,180 @@
     rel="stylesheet">
 
   <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: radial-gradient(circle at center, #ffb200, #ff5200, #a80000);
-    }
+   :root{
+  --bg1: #ffb200;
+  --bg2: #ff7300;
+  --bg3: #a80000;
+  --accent: #ffb200;
+  --muted: rgba(255,255,255,0.85);
+}
 
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
+/* Página */
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+  margin:0;
+  font-family: "Montserrat", "Inter", sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+  background-size:200% 200%;
+  animation: bgMove 10s ease-in-out infinite alternate;
+  color:#fff;
+  overflow:hidden;
+}
+@keyframes bgMove{0%{background-position:0% 50%}100%{background-position:100% 50%}}
 
-    /* Efeito de gradiente dinâmico suave */
-    @keyframes gradientShift {
-      0% {
-        background: radial-gradient(circle at center, #ffb200, #ff5200, #a80000);
-      }
+/* canvas de partículas e .bg ficam por trás */
+canvas#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg{position:fixed;inset:0;background-position:center;background-size:cover;filter:brightness(.35);z-index:0}
 
-      50% {
-        background: radial-gradient(circle at 40% 60%, #ffd000, #ff7300, #c00000);
-      }
+/* Wrapper central — substitui grid da versão anterior */
+#app{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:980px;
+  margin:32px auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:26px;
+  padding:20px;
+}
 
-      100% {
-        background: radial-gradient(circle at center, #ffb200, #ff5200, #a80000);
-      }
-    }
+/* Painel principal (o card laranja grande das telas) */
+.panel{
+  width:100%;
+  background: linear-gradient(180deg, rgba(10,10,10,0.48), rgba(5,5,5,0.48));
+  border-radius:20px;
+  padding:34px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.02);
+  border: 1px solid rgba(0,0,0,0.25);
+  color:#fff;
+  display:block;
+}
 
-    body {
-      animation: gradientShift 10s ease-in-out infinite alternate;
-    }
+/* esconder a sidebar (não existe nas imagens) */
+.sidebar{display:none !important}
 
-    :root {
-      --bg-900: #071027;
-      --bg-800: #0b1320;
-      --glass: rgba(255, 255, 255, 0.05);
-      --glass-2: rgba(255, 255, 255, 0.035);
-      --accent: #ffb33a;
-      --accent-2: #10b981;
-      --muted: rgba(255, 255, 255, 0.75);
-      --card: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-      --shadow: 0 8px 30px rgba(2, 6, 23, 0.7);
-      --glass-border: rgba(255, 255, 255, 0.06);
-      --glass-glow: 0 6px 30px rgba(16, 185, 129, 0.06);
-      --radius: 12px;
-    }
+/* start screen layout — centralizado como na imagem */
+.start-screen{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+  text-align:center;
+}
 
-    * {
-      box-sizing: border-box
-    }
+/* logo grande */
+.brand{display:flex;flex-direction:column;align-items:center;gap:6px}
+.logo{
+  width:86px;height:86px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  background: linear-gradient(135deg,var(--bg1),var(--bg2));
+  font-weight:900;color:#fff;font-size:30px;
+  box-shadow: 0 8px 28px rgba(255,140,0,0.28);
+}
 
-    html,
-    body {
-      height: 100%;
-    }
+/* título */
+h1{margin:0;font-size:44px;letter-spacing:1px;font-weight:900}
+p.lead{margin:0;color:rgba(255,255,255,0.9);font-size:16px}
 
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(255, 179, 58, 0.06), transparent),
-        radial-gradient(900px 400px at 90% 90%, rgba(16, 185, 129, 0.04), transparent),
-        var(--bg-900);
-      color: #fff;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 28px;
-    }
+/* controles (inputs) — agrupados centralizados */
+.controls, .control {
+  display:flex;
+}
+.controls{gap:12px;flex-wrap:wrap;justify-content:center;align-items:end}
+.control{
+  min-width:220px;
+  background: rgba(0,0,0,0.28);
+  padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.25);
+  color:var(--muted);
+}
 
-    /* App wrapper */
-    #app {
-      width: 100%;
-      max-width: 1150px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      align-items: start;
-    }
+/* inputs */
+input[type=number], input[type=text]{
+  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03); color:#fff; font-size:14px;
+}
 
-    /* Background image layer */
-    .bg {
-      position: fixed;
-      inset: 0;
-      background-image: url('background.png');
-      background-size: cover;
-      background-position: center;
-      filter: brightness(.35) blur(2px);
-      z-index: -1;
-    }
+/* lista de jogadores */
+.player-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.player-name{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff}
 
-    /* Left column (main screens) */
-    .panel {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(6px) saturate(1.05);
-    }
+/* botões grandes idênticos */
+.btn{
+  cursor:pointer;border:none;border-radius:18px;padding:12px 20px;font-weight:800;letter-spacing:.6px;
+  text-transform:uppercase;box-shadow:0 8px 24px rgba(0,0,0,0.45);
+}
+.btn--primary{
+  background: linear-gradient(90deg,var(--bg1),var(--bg2));
+  color:#fff;
+  box-shadow:0 10px 30px rgba(255,115,0,0.32);
+}
+.btn--primary:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(255,115,0,0.38)}
+.btn--muted{
+  background: rgba(0,0,0,0.22); color:rgba(255,255,255,0.9); border:1px solid rgba(255,255,255,0.03);
+}
 
-    header.start-screen {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+/* area do jogo (covers) — central, espaçamento idêntico */
+.game-area{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+.status{display:flex;align-items:center;gap:12px;justify-content:center;width:100%}
+.status .line{font-weight:800;font-size:16px}
+.small{font-size:13px;color:rgba(255,255,255,0.85)}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+/* progress bar estilosa */
+.progress{height:10px;border-radius:999px;background:rgba(0,0,0,0.18);width:360px;overflow:hidden;border:1px solid rgba(0,0,0,0.25)}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--bg1),var(--bg2));width:0%;transition:width .6s ease}
 
-    .logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0ea5a3, #7c3aed);
-      font-weight: 900;
-      font-family: Montserrat, Inter, sans-serif;
-      color: white;
-      font-size: 20px;
-      box-shadow: var(--glass-glow);
-    }
+/* CAPAS — o quadrado com badge */
+.covers{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(110px,1fr));
+  gap:20px;
+  width:100%;
+  justify-items:center;
+  align-items:start;
+  padding:6px 10px;
+}
+.cover{
+  width:160px;height:160px;border-radius:14px;overflow:hidden;position:relative;background:#111;border:2px solid rgba(0,0,0,0.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.55);transition:transform .28s ease, box-shadow .28s ease, opacity .28s ease;
+  display:flex;align-items:center;justify-content:center;
+}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 18px 48px rgba(0,0,0,0.6)}
+.cover .badge{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#111;width:70px;height:70px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;color:rgba(255,255,255,0.95);
+  box-shadow: inset 0 -8px 18px rgba(255,120,0,0.07), 0 8px 20px rgba(0,0,0,0.45);border:6px solid rgba(0,0,0,0.5)
+}
 
-    h1 {
-      margin: 0;
-      font-family: Montserrat, Inter, sans-serif;
-      font-size: 20px;
-    }
+/* painel de votação e resultados */
+.vote-panel{margin-top:12px;background:rgba(0,0,0,0.28);padding:14px;border-radius:12px;border:1px solid rgba(0,0,0,0.2);width:100%;display:flex;flex-direction:column;align-items:center}
+.vote-input{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:10px}
+.hidden-input, input.vote-digit{width:120px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:#fff;text-align:center;font-size:18px}
 
-    p.lead {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px
-    }
+.results{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;width:100%}
+.winner{font-weight:900;font-size:20px;color:var(--accent);text-shadow:0 8px 30px rgba(255,179,58,0.18)}
 
-    /* Controls */
-    .controls {
-      display: flex;
-      gap: 12px;
-      align-items: end;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
+/* modal final */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal.show{opacity:1;pointer-events:auto}
+.modal-inner{width:min(760px,92%);padding:26px;border-radius:16px;background:linear-gradient(180deg,#451600,#2b0a00);box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
 
-    .control {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--glass-border);
-      min-width: 160px;
-    }
+/* score list fallback (se aparecer) */
+.score-card{display:none}
 
-    label {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px
-    }
+/* responsive adjustments */
+@media (max-width:980px){
+  h1{font-size:34px}
+  .covers{grid-template-columns:repeat(2,1fr);gap:14px}
+  .cover{width:46vw;height:46vw;max-width:200px;max-height:200px}
+  #app{margin:18px;padding:12px}
+}
 
-    input[type=number],
-    input[type=text] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: transparent;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .player-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .player-chip {
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      font-size: 13px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    /* Primary button */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      padding: 10px 16px;
-      border-radius: 10px;
-      border: none;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      box-shadow: 0 6px 20px rgba(2, 6, 23, 0.5);
-    }
-
-    .btn--primary {
-      background: linear-gradient(90deg, var(--accent), #ff8c2a);
-      color: #071027;
-    }
-
-    .btn--muted {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--muted);
-    }
-
-    /* Game area */
-    .game-area {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .covers {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      align-items: start;
-    }
-
-    .cover {
-      aspect-ratio: 1/1;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      background: #111;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      transition: transform .28s cubic-bezier(.2, .9, .3, 1), box-shadow .28s;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cover img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform .5s
-    }
-
-    .cover:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 14px 40px rgba(2, 6, 23, 0.6);
-    }
-
-    .cover .badge {
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 6px 8px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 13px;
-      border: 1px solid rgba(255, 255, 255, 0.03)
-    }
-
-    /* status and progress */
-    .status {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .status .left {
-      display: flex;
-      gap: 12px;
-      align-items: center
-    }
-
-    .status .line {
-      font-weight: 800;
-      font-size: 15px
-    }
-
-    .progress {
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      overflow: hidden;
-      width: 320px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .progress>i {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #ff8c2a);
-      width: 0%;
-      transition: width .6s ease;
-    }
-
-    /* vote panel */
-    /* Campo invisível de voto (sem mostrar caractere algum) */
-    .vote-panel input[type="text"].hidden-input {
-      color: transparent !important;
-      text-shadow: 0 0 0 transparent !important;
-      caret-color: transparent;
-    }
-
-    .vote-panel .instruction {
-      font-weight: 700
-    }
-
-    .vote-input {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    input.vote-digit {
-      width: 88px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 20px;
-      text-align: center;
-      background: transparent;
-      color: #fff;
-      letter-spacing: 6px;
-    }
-
-    /* results */
-    .results {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 12px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .winner {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--accent);
-      text-shadow: 0 6px 24px rgba(255, 179, 58, 0.08)
-    }
-
-    /* Right column: scoreboard */
-    .sidebar {
-      position: sticky;
-      top: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .score-card {
-      padding: 16px;
-      border-radius: 12px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.03)
-    }
-
-    .score-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between
-    }
-
-    .score-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 12px
-    }
-
-    .score-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.12);
-      font-weight: 600
-    }
-
-    .small {
-      font-size: 13px;
-      color: var(--muted)
-    }
-
-    /* modal final */
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 9999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s;
-    }
-
-    .modal.show {
-      opacity: 1;
-      pointer-events: auto
-    }
-
-    .modal-inner {
-      background: linear-gradient(180deg, #081022, #061018);
-      padding: 28px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      width: min(720px, 96%);
-      box-shadow: var(--shadow)
-    }
-
-    /* responsive */
-    @media (max-width:980px) {
-      #app {
-        grid-template-columns: 1fr;
-        padding-bottom: 60px
-      }
-
-      .sidebar {
-        position: relative;
-        top: unset
-      }
-    }
   </style>
 </head>
 
@@ -533,8 +262,9 @@
           </div>
 
           <div class="vote-input">
-            <input id="voteInput" type="text" inputmode="numeric" maxlength="1" class="hidden-input" autocomplete="off"
-              autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input id="voteInput" type="text" class="hidden-input" 
+              style="opacity:0;position:absolute;left:-9999px;width:0;height:0;border:0;padding:0;"
+              inputmode="none" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             <button class="btn btn--primary" id="confirmVote">Confirmar</button>
           </div>
         </div>
@@ -1158,6 +888,27 @@
     /* =========================
        Inicializações
        ========================= */
+
+    /* =========================
+   Controle de teclado global
+   ========================= */
+document.addEventListener('keydown', e => {
+  // Evita abrir teclado no mobile
+  if (['1','2','3','4','Enter'].includes(e.key)) e.preventDefault();
+
+  // Digitar 1–4 = voto direto
+  if (/^[1-4]$/.test(e.key) && votePanel.style.display !== 'none') {
+    voteInput.value = e.key;
+    confirmVote.click();
+  }
+
+  // Enter: se estiver em results, avança rodada
+  if (e.key === 'Enter' && resultsEl.style.display !== 'none') {
+    e.preventDefault();
+    nextRoundBtn.click();
+  }
+});
+
     // enterrar listeners que usam elementos carregados
     document.addEventListener('DOMContentLoaded', () => {
       totalRoundsInput.value = DEFAULT_TOTAL_ROUNDS;
